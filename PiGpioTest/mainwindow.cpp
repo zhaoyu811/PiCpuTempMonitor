@@ -40,6 +40,9 @@ MainWindow::MainWindow(QWidget *parent)
     QGridLayout *mainLayout = new QGridLayout(widget);
     widget->setLayout(mainLayout);
 
+    //3. 初始化GPIO
+    wiringPiSetup();
+
     //1. 初始化checkBox
     QString pinNames("3.3v,GPIO.8,GPIO.9,GPIO.7,0v,GPIO.0,GPIO.2,GPIO.3,3.3v,GPIO.12,GPIO.13,GPIO.14,0v,GPIO.30,GPIO.21,\
             GPIO.22,GPIO.23,GPIO.24,GPIO.25,0v,5v,5v,0v,GPIO.15,GPIO.16,GPIO.1,0v,GPIO.4,GPIO.5,0v,GPIO.6,GPIO.10,GPIO.11,\
@@ -49,75 +52,20 @@ MainWindow::MainWindow(QWidget *parent)
 
     for(int i=0; i<40; i++)
     {
-        checkBox[i].setText(pinNamesList[i]);
-        if(checkBox[i].text().contains("0v"))
-        {
-            checkBox[i].setCheckState(Qt::Unchecked);
-            checkBox[i].setCheckable(false);
-            checkBox[i].setStyleSheet(QString(" QCheckBox::indicator:unchecked {\
-                            image: url(:/img/img/off.png);\
-                            }\
-                            QCheckBox::indicator:checked {\
-                            image: url(:/img/img/off.png);\
-                            }"));
-        }
-        else if(checkBox[i].text()=="3.3v" || checkBox[i].text()=="5v")
-        {
-            checkBox[i].setCheckState(Qt::Checked);
-            checkBox[i].setCheckable(false);
-            checkBox[i].setStyleSheet(QString(" QCheckBox::indicator:unchecked {\
-                            image: url(:/img/img/on.png);\
-                            }\
-                            QCheckBox::indicator:checked {\
-                            image: url(:/img/img/on.png);\
-                            }"));
-        }
-        else
-        {
-            connect(&checkBox[i], &QCheckBox::clicked, this, &MainWindow::CheckBoxClicked);
-            checkBox[i].setStyleSheet(QString(" QCheckBox::indicator:unchecked {\
-                            image: url(:/img/img/off.png);\
-                            }\
-                            QCheckBox::indicator:checked {\
-                            image: url(:/img/img/on.png);\
-                            }"));
-        }
-
+        gpioPinsWidget[i].SetGpioName(pinNamesList[i]);
     }
     //2. 放入Layout中
     for(int i=0; i<2; i++)
     {
         for(int j=0; j<20; j++)
-            mainLayout->addWidget(&checkBox[j+(i*20)], i, j);
+            mainLayout->addWidget(&gpioPinsWidget[j+(i*20)], i, j);
     }
 
     this->setCentralWidget(widget);
-    //3. 初始化GPIO
-    wiringPiSetup();
-    for(int i=0; i<40; i++)
-    {
-        if(pinNamesList[i].contains("GPIO"))
-        {
-            pinMode(pinNamesList[i].split(".").at(1).toInt(), OUTPUT);
-        }
-    }
 }
 
 MainWindow::~MainWindow()
 {
 
-}
-
-void MainWindow::CheckBoxClicked(bool checked)
-{
-    QCheckBox * checkBox = qobject_cast<QCheckBox *>(sender());
-    if(checked)
-    {
-        digitalWrite(checkBox->text().split(".").at(1).toInt(), 1);
-    }
-    else
-    {
-        digitalWrite(checkBox->text().split(".").at(1).toInt(), 0);
-    }
 }
 

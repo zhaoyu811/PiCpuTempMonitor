@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QCheckBox>
 #include <QVector>
+#include "gpiopinswidget.h"
 
 /*
 pi@raspberrypi:~ $ gpio pins
@@ -43,10 +44,8 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-private slots:
-    void CheckBoxClicked(bool checked);
-
 private:
-    QCheckBox checkBox[40];
+    //QCheckBox checkBox[40];
+    GpioPinsWidget gpioPinsWidget[40];
 };
 #endif // MAINWINDOW_H
